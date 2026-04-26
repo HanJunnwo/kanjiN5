@@ -1,0 +1,22 @@
+{
+  "name": "Kanji N5 Quiz",
+  "short_name": "KanjiN5",
+  "description": "Belajar dan Quiz Kanji JLPT N5",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#080812",
+  "theme_color": "#080812",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
