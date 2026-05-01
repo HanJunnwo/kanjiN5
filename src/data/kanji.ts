@@ -8,7 +8,12 @@ export type KanjiCategory =
   | "Kata Sifat"
   | "Pendidikan & Sosial"
   | "Alam"
-  | "Lainnya";
+  | "Lainnya"
+  | "Angka & Satuan"
+  | "Pendidikan & Sekolah"
+  | "Kata Kerja Lanjutan"
+  | "Alam & Cuaca"
+  | "Benda & Kehidupan";
 
 export interface Kanji {
   id: number;
@@ -142,6 +147,57 @@ export const kanjiData: Kanji[] = [
   { id: 101, character: "物", onyomi: "Butsu", kunyomi: "Mono", meaning: "Benda", category: "Lainnya" },
   { id: 102, character: "茶", onyomi: "Cha / Sa", kunyomi: "-", meaning: "Teh", category: "Lainnya" },
   { id: 103, character: "万", onyomi: "Man", kunyomi: "-", meaning: "Sepuluh Ribu", category: "Lainnya" },
+
+  // Angka & Satuan
+  { id: 104, character: "一つ", onyomi: "Hitotsu", kunyomi: "Hitotsu", meaning: "Satu (benda umum)", category: "Angka & Satuan" },
+  { id: 105, character: "二つ", onyomi: "Futatsu", kunyomi: "Futatsu", meaning: "Dua (benda umum)", category: "Angka & Satuan" },
+  { id: 106, character: "三つ", onyomi: "Mittsu", kunyomi: "Mittsu", meaning: "Tiga (benda umum)", category: "Angka & Satuan" },
+  { id: 107, character: "一人", onyomi: "Hitori", kunyomi: "Hitori", meaning: "Satu orang", category: "Angka & Satuan" },
+  { id: 108, character: "二人", onyomi: "Futari", kunyomi: "Futari", meaning: "Dua orang", category: "Angka & Satuan" },
+  { id: 109, character: "五人", onyomi: "Gonin", kunyomi: "Gonin", meaning: "Lima orang", category: "Angka & Satuan" },
+  { id: 110, character: "一分", onyomi: "Ippun", kunyomi: "Ippun", meaning: "Satu menit", category: "Angka & Satuan" },
+  { id: 111, character: "半年", onyomi: "Hantoshi", kunyomi: "Hantoshi", meaning: "Setengah tahun", category: "Angka & Satuan" },
+
+  // Pendidikan & Sekolah
+  { id: 112, character: "大学", onyomi: "Daigaku", kunyomi: "Daigaku", meaning: "Universitas", category: "Pendidikan & Sekolah" },
+  { id: 113, character: "教室", onyomi: "Kyoushitsu", kunyomi: "Kyoushitsu", meaning: "Ruang kelas", category: "Pendidikan & Sekolah" },
+  { id: 114, character: "先生", onyomi: "Sensei", kunyomi: "Sensei", meaning: "Guru / Pengajar", category: "Pendidikan & Sekolah" },
+  { id: 115, character: "学生", onyomi: "Gakusei", kunyomi: "Gakusei", meaning: "Mahasiswa", category: "Pendidikan & Sekolah" },
+  { id: 116, character: "留学生", onyomi: "Ryuugakusei", kunyomi: "Ryuugakusei", meaning: "Mahasiswa asing", category: "Pendidikan & Sekolah" },
+  { id: 117, character: "辞書", onyomi: "Jisho", kunyomi: "Jisho", meaning: "Kamus", category: "Pendidikan & Sekolah" },
+  { id: 118, character: "作文", onyomi: "Sakubun", kunyomi: "Sakubun", meaning: "Karangan / Esai", category: "Pendidikan & Sekolah" },
+  { id: 119, character: "宿題", onyomi: "Shukudai", kunyomi: "Shukudai", meaning: "Pekerjaan Rumah (PR)", category: "Pendidikan & Sekolah" },
+  { id: 120, character: "試験", onyomi: "Shiken", kunyomi: "Shiken", meaning: "Ujian", category: "Pendidikan & Sekolah" },
+
+  // Kata Kerja Lanjutan
+  { id: 121, character: "入る", onyomi: "Nyuu", kunyomi: "Hairu", meaning: "Masuk", category: "Kata Kerja Lanjutan" },
+  { id: 122, character: "出る", onyomi: "Shutsu", kunyomi: "Deru", meaning: "Keluar", category: "Kata Kerja Lanjutan" },
+  { id: 123, character: "座る", onyomi: "Za", kunyomi: "Suwaru", meaning: "Duduk", category: "Kata Kerja Lanjutan" },
+  { id: 124, character: "立つ", onyomi: "Ritsu", kunyomi: "Tatsu", meaning: "Berdiri", category: "Kata Kerja Lanjutan" },
+  { id: 125, character: "会う", onyomi: "Kai", kunyomi: "Au", meaning: "Bertemu", category: "Kata Kerja Lanjutan" },
+  { id: 126, character: "遊ぶ", onyomi: "Yuu", kunyomi: "Asobu", meaning: "Bermain", category: "Kata Kerja Lanjutan" },
+  { id: 127, character: "待つ", onyomi: "Tai", kunyomi: "Matsu", meaning: "Menunggu", category: "Kata Kerja Lanjutan" },
+  { id: 128, character: "呼ぶ", onyomi: "Ko", kunyomi: "Yobu", meaning: "Memanggil", category: "Kata Kerja Lanjutan" },
+  { id: 129, character: "洗う", onyomi: "Sen", kunyomi: "Arau", meaning: "Mencuci", category: "Kata Kerja Lanjutan" },
+  { id: 130, character: "作る", onyomi: "Saku", kunyomi: "Tsukuru", meaning: "Membuat", category: "Kata Kerja Lanjutan" },
+
+  // Alam & Cuaca
+  { id: 131, character: "空", onyomi: "Kuu", kunyomi: "Sora", meaning: "Langit", category: "Alam & Cuaca" },
+  { id: 132, character: "海", onyomi: "Kai", kunyomi: "Umi", meaning: "Laut", category: "Alam & Cuaca" },
+  { id: 133, character: "山", onyomi: "San", kunyomi: "Yama", meaning: "Gunung", category: "Alam & Cuaca" },
+  { id: 134, character: "川", onyomi: "Sen", kunyomi: "Kawa", meaning: "Sungai", category: "Alam & Cuaca" },
+  { id: 135, character: "雨", onyomi: "U", kunyomi: "Ame", meaning: "Hujan", category: "Alam & Cuaca" },
+  { id: 136, character: "雪", onyomi: "Setsu", kunyomi: "Yuki", meaning: "Salju", category: "Alam & Cuaca" },
+  { id: 137, character: "風", onyomi: "Fuu", kunyomi: "Kaze", meaning: "Angin", category: "Alam & Cuaca" },
+  { id: 138, character: "晴れ", onyomi: "Sei", kunyomi: "Hare", meaning: "Cerah", category: "Alam & Cuaca" },
+
+  // Benda & Kehidupan Sehari-hari
+  { id: 139, character: "家", onyomi: "Ka / Ke", kunyomi: "Ie", meaning: "Rumah", category: "Benda & Kehidupan" },
+  { id: 140, character: "電気", onyomi: "Denki", kunyomi: "Denki", meaning: "Listrik / Lampu", category: "Benda & Kehidupan" },
+  { id: 141, character: "電話", onyomi: "Denwa", kunyomi: "Denwa", meaning: "Telepon", category: "Benda & Kehidupan" },
+  { id: 142, character: "電車", onyomi: "Densha", kunyomi: "Densha", meaning: "Kereta listrik", category: "Benda & Kehidupan" },
+  { id: 143, character: "自転車", onyomi: "Jitensha", kunyomi: "Jitensha", meaning: "Sepeda", category: "Benda & Kehidupan" },
+  { id: 144, character: "荷物", onyomi: "Nimotsu", kunyomi: "Nimotsu", meaning: "Barang bawaan / Paket", category: "Benda & Kehidupan" },
 ];
 
 export const categories: KanjiCategory[] = [
@@ -155,6 +211,11 @@ export const categories: KanjiCategory[] = [
   "Pendidikan & Sosial",
   "Alam",
   "Lainnya",
+  "Angka & Satuan",
+  "Pendidikan & Sekolah",
+  "Kata Kerja Lanjutan",
+  "Alam & Cuaca",
+  "Benda & Kehidupan",
 ];
 
 export const categoryEmoji: Record<KanjiCategory, string> = {
@@ -168,6 +229,11 @@ export const categoryEmoji: Record<KanjiCategory, string> = {
   "Pendidikan & Sosial": "🏫",
   "Alam": "🌿",
   "Lainnya": "✨",
+  "Angka & Satuan": "🔢",
+  "Pendidikan & Sekolah": "🎓",
+  "Kata Kerja Lanjutan": "🏃",
+  "Alam & Cuaca": "🌤️",
+  "Benda & Kehidupan": "🏠",
 };
 
 export function getRandomKanji(exclude?: number[]): Kanji {

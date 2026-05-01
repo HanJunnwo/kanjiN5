@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import ResultModal from "@/components/ResultModal";
-import { kanjiData, Kanji } from "@/data/kanji";
+import { kanjiData, categories, categoryEmoji, Kanji } from "@/data/kanji";
 import { useProgress } from "@/hooks/useProgress";
 import { MeaningIcon, ReadingIcon, WritingIcon } from "@/components/icons/UIIcons";
 import { QuizIcon } from "@/components/icons/NavIcons";
@@ -72,6 +72,7 @@ export default function QuizPage() {
   const [quizState, setQuizState] = useState<QuizState>("setup");
   const [selectedMode, setSelectedMode] = useState<QuizMode>("meaning");
   const [questionCount, setQuestionCount] = useState(10);
+  const [selectedCategory, setSelectedCategory] = useState<string>("Semua");
 
   // Quiz playing state
   const [questions, setQuestions] = useState<Kanji[]>([]);
@@ -84,7 +85,11 @@ export default function QuizPage() {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const startQuiz = useCallback(() => {
-    const shuffled = shuffle(kanjiData).slice(0, questionCount);
+    const pool =
+      selectedCategory === "Semua"
+        ? kanjiData
+        : kanjiData.filter((k) => k.category === selectedCategory);
+    const shuffled = shuffle(pool).slice(0, questionCount);
     setQuestions(shuffled);
     setCurrentIdx(0);
     setScore(0);
@@ -93,7 +98,7 @@ export default function QuizPage() {
     setIsAnswered(false);
     setShowResult(false);
     setQuizState("playing");
-  }, [questionCount]);
+  }, [questionCount, selectedCategory]);
 
   const handleAnswer = useCallback(
     (answer: string) => {
@@ -206,7 +211,7 @@ export default function QuizPage() {
             </div>
           </motion.div>
 
-          {/* Question Count */}
+          {/* Category Filter */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -214,19 +219,63 @@ export default function QuizPage() {
             style={{ marginTop: 24 }}
           >
             <div className="section-header">
+              <h2 className="section-title">Kategori</h2>
+              <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+                {selectedCategory === "Semua"
+                  ? `${kanjiData.length} kanji`
+                  : `${kanjiData.filter((k) => k.category === selectedCategory).length} kanji`}
+              </span>
+            </div>
+            <div className="category-scroll">
+              <button
+                className={`category-pill ${selectedCategory === "Semua" ? "active" : ""}`}
+                onClick={() => setSelectedCategory("Semua")}
+                id="quiz-cat-all-btn"
+              >
+                🌸 Semua
+              </button>
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  className={`category-pill ${selectedCategory === cat ? "active" : ""}`}
+                  onClick={() => setSelectedCategory(cat)}
+                  id={`quiz-cat-${cat.replace(/\s|&/g, "-").toLowerCase()}-btn`}
+                >
+                  {categoryEmoji[cat]} {cat}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Question Count */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            style={{ marginTop: 24 }}
+          >
+            <div className="section-header">
               <h2 className="section-title">Jumlah Soal</h2>
             </div>
             <div className="setup-count-selector">
-              {QUIZ_COUNTS.map((count) => (
-                <button
-                  key={count}
-                  className={`count-pill ${questionCount === count ? "active" : ""}`}
-                  onClick={() => setQuestionCount(count)}
-                  id={`count-${count}-btn`}
-                >
-                  {count} soal
-                </button>
-              ))}
+              {QUIZ_COUNTS.map((count) => {
+                const poolSize =
+                  selectedCategory === "Semua"
+                    ? kanjiData.length
+                    : kanjiData.filter((k) => k.category === selectedCategory).length;
+                const isDisabled = count > poolSize;
+                return (
+                  <button
+                    key={count}
+                    className={`count-pill ${questionCount === count ? "active" : ""}`}
+                    onClick={() => !isDisabled && setQuestionCount(Math.min(count, poolSize))}
+                    id={`count-${count}-btn`}
+                    style={{ opacity: isDisabled ? 0.35 : 1, cursor: isDisabled ? "not-allowed" : "pointer" }}
+                  >
+                    {count} soal
+                  </button>
+                );
+              })}
             </div>
           </motion.div>
 
@@ -234,17 +283,37 @@ export default function QuizPage() {
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.4 }}
             style={{ marginTop: 32 }}
           >
-            <button
-              className="btn-primary"
-              onClick={startQuiz}
-              id="start-quiz-btn"
-              style={{ width: "100%", fontSize: 16, padding: "16px" }}
-            >
-              Mulai Quiz — {questionCount} Soal
-            </button>
+            {(() => {
+              const poolSize =
+                selectedCategory === "Semua"
+                  ? kanjiData.length
+                  : kanjiData.filter((k) => k.category === selectedCategory).length;
+              const canStart = poolSize >= 4;
+              return (
+                <>
+                  {!canStart && (
+                    <p style={{ textAlign: "center", color: "var(--accent-gold)", fontSize: 13, marginBottom: 12 }}>
+                      ⚠️ Kategori ini memiliki terlalu sedikit kanji untuk quiz (min. 4)
+                    </p>
+                  )}
+                  <button
+                    className="btn-primary"
+                    onClick={startQuiz}
+                    id="start-quiz-btn"
+                    disabled={!canStart}
+                    style={{ width: "100%", fontSize: 16, padding: "16px", opacity: canStart ? 1 : 0.5 }}
+                  >
+                    Mulai Quiz — {Math.min(questionCount, poolSize)} Soal
+                    {selectedCategory !== "Semua" && (
+                      <span style={{ fontSize: 12, marginLeft: 8, opacity: 0.8 }}>· {selectedCategory}</span>
+                    )}
+                  </button>
+                </>
+              );
+            })()}
           </motion.div>
         </main>
         <Navbar />
