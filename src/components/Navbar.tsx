@@ -4,12 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 
-import { HomeIcon, LearnIcon, QuizIcon, ProgressIcon, PenIcon } from "@/components/icons/NavIcons";
+import { HomeIcon, LearnIcon, QuizIcon, ProgressIcon } from "@/components/icons/NavIcons";
 
 const navItems = [
   { href: "/", icon: <HomeIcon />, label: "Home" },
   { href: "/learn", icon: <LearnIcon />, label: "Belajar" },
-  { href: "/writing", icon: <PenIcon />, label: "Menulis" },
   { href: "/levels", icon: <QuizIcon />, label: "Ujian" },
   { href: "/stories", icon: <LearnIcon />, label: "Bacaan" },
   { href: "/progress", icon: <ProgressIcon />, label: "Progress" },
