@@ -4,13 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 
-import { HomeIcon, LearnIcon, QuizIcon, ProgressIcon } from "@/components/icons/NavIcons";
+import { HomeIcon, LearnIcon, QuizIcon, ProgressIcon, BookIcon, FileTextIcon } from "@/components/icons/NavIcons";
 
 const navItems = [
   { href: "/", icon: <HomeIcon />, label: "Home" },
   { href: "/learn", icon: <LearnIcon />, label: "Belajar" },
+  { href: "/vocabulary", icon: <BookIcon />, label: "Kosakata" },
   { href: "/levels", icon: <QuizIcon />, label: "Ujian" },
-  { href: "/stories", icon: <LearnIcon />, label: "Bacaan" },
+  { href: "/stories", icon: <FileTextIcon />, label: "Bacaan" },
   { href: "/progress", icon: <ProgressIcon />, label: "Progress" },
 ];
 
