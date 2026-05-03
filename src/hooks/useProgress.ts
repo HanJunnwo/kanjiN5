@@ -10,6 +10,7 @@ export interface ProgressData {
   streak: number;
   lastStudyDate: string;
   quizHistory: { date: string; score: number; total: number }[];
+  completedLevels: number[]; // Array of level IDs that are completed
 }
 
 const DEFAULT_PROGRESS: ProgressData = {
@@ -21,6 +22,7 @@ const DEFAULT_PROGRESS: ProgressData = {
   streak: 0,
   lastStudyDate: "",
   quizHistory: [],
+  completedLevels: [],
 };
 
 const STORAGE_KEY = "kanji_n5_progress";
@@ -74,6 +76,7 @@ export function useProgress() {
             { date: today, score, total },
             ...prev.quizHistory.slice(0, 29),
           ],
+          completedLevels: prev.completedLevels || [],
         };
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
@@ -98,6 +101,17 @@ export function useProgress() {
     });
   }, []);
 
+  const completeLevel = useCallback((levelId: number) => {
+    setProgress((prev) => {
+      const completedLevels = Array.from(new Set([...(prev.completedLevels || []), levelId]));
+      const updated = { ...prev, completedLevels };
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  }, []);
+
   const resetProgress = useCallback(() => {
     save(DEFAULT_PROGRESS);
   }, [save]);
@@ -107,7 +121,7 @@ export function useProgress() {
       ? Math.round((progress.totalCorrect / progress.totalAnswered) * 100)
       : 0;
 
-  return { progress, recordQuiz, markMastered, resetProgress, accuracy };
+  return { progress, recordQuiz, markMastered, completeLevel, resetProgress, accuracy };
 }
 
 function getPreviousDay(dateStr: string): string {

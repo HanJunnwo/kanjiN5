@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Kanji } from "@/data/kanji";
 import { TapIcon, MeaningIcon } from "@/components/icons/UIIcons";
+import KanjiWriter from "./KanjiWriter";
 
 interface KanjiCardProps {
   kanji: Kanji;
@@ -14,26 +15,33 @@ export default function KanjiCard({ kanji, showNumber = false }: KanjiCardProps)
   const [flipped, setFlipped] = useState(false);
 
   return (
-    <div className="flip-card-container" onClick={() => setFlipped(!flipped)}>
+    <div className="flip-card-container">
       <div className={`flip-card ${flipped ? "flipped" : ""}`}>
         {/* Front */}
         <div className="flip-card-front">
-          {showNumber && (
-            <span className="badge badge-purple" style={{ marginBottom: 12 }}>
-              #{kanji.id}
+          <div onClick={() => setFlipped(true)} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer' }}>
+            {showNumber && (
+              <span className="badge badge-purple" style={{ marginBottom: 12 }}>
+                #{kanji.id}
+              </span>
+            )}
+            <span className="flip-prompt">Kanji</span>
+            <span className="kanji-display" aria-label={`Kanji: ${kanji.character}`}>
+              {kanji.character}
             </span>
-          )}
-          <span className="flip-prompt">Kanji</span>
-          <span className="kanji-display" aria-label={`Kanji: ${kanji.character}`}>
-            {kanji.character}
-          </span>
-          <span className="flip-hint" style={{ display: "flex", alignItems: "center" }}>
-            <TapIcon style={{ width: 14, height: 14, marginRight: 4 }} /> tap untuk lihat arti
-          </span>
+            <span className="flip-hint" style={{ display: "flex", alignItems: "center" }}>
+              <TapIcon style={{ width: 14, height: 14, marginRight: 4 }} /> tap untuk lihat arti
+            </span>
+          </div>
+
+          <div style={{ marginTop: 20, width: '100%' }}>
+             <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10, textAlign: 'center' }}>Latihan Menulis</p>
+             <KanjiWriter character={kanji.character} size={120} />
+          </div>
         </div>
 
         {/* Back */}
-        <div className="flip-card-back">
+        <div className="flip-card-back" onClick={() => setFlipped(false)}>
           <span className="flip-prompt">Arti & Cara Baca</span>
           <p className="kanji-meaning">{kanji.meaning}</p>
           <div style={{ marginBottom: 12 }}>
@@ -44,6 +52,22 @@ export default function KanjiCard({ kanji, showNumber = false }: KanjiCardProps)
               <p className="kanji-sub">Kunyomi: {kanji.kunyomi}</p>
             )}
           </div>
+
+          {kanji.examples && kanji.examples.length > 0 && (
+            <div style={{ marginBottom: 16, textAlign: 'left', width: '100%' }}>
+              <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6 }}>Contoh Kata:</p>
+              {kanji.examples.map((ex, i) => (
+                <div key={i} style={{ background: 'rgba(255,255,255,0.05)', padding: '6px 10px', borderRadius: 8, marginBottom: 4 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                    <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--accent-cyan)' }}>{ex.word}</span>
+                    <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{ex.reading}</span>
+                  </div>
+                  <p style={{ fontSize: 12, color: 'var(--text-primary)' }}>{ex.meaning}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
           <span className="badge badge-cyan">{kanji.category}</span>
           <span className="flip-hint" style={{ marginTop: 12, display: "flex", alignItems: "center" }}>
             <TapIcon style={{ width: 14, height: 14, marginRight: 4 }} /> tap untuk kembali
