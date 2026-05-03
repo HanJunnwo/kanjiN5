@@ -97,16 +97,26 @@ export default function HomePage() {
             <div className="section-header">
               <h2 className="section-title">Mulai Belajar</h2>
             </div>
-            <div className="action-grid">
+            <div className="action-grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <Link href="/learn" className="action-card purple" id="home-learn-btn">
                 <BookIcon className="action-icon" />
                 <span className="action-title">Flashcard</span>
-                <span className="action-desc">Belajar kanji dengan kartu interaktif</span>
+                <span className="action-desc">Belajar kanji & nulis</span>
               </Link>
-              <Link href="/quiz" className="action-card cyan" id="home-quiz-btn">
+              <Link href="/levels" className="action-card cyan" id="home-quiz-btn">
                 <QuizIcon className="action-icon" />
-                <span className="action-title">Quiz</span>
-                <span className="action-desc">Uji kemampuan kanji kamu</span>
+                <span className="action-title">Ujian</span>
+                <span className="action-desc">20 Level tantangan</span>
+              </Link>
+              <Link href="/stories" className="action-card gold" id="home-stories-btn">
+                <BookIcon className="action-icon" />
+                <span className="action-title">Bacaan</span>
+                <span className="action-desc">Cerita pendek N5</span>
+              </Link>
+              <Link href="/quiz" className="action-card purple" id="home-quick-quiz-btn">
+                <QuizIcon className="action-icon" />
+                <span className="action-title">Quick Quiz</span>
+                <span className="action-desc">Latihan cepat</span>
               </Link>
             </div>
           </motion.div>

@@ -9,7 +9,8 @@ import { HomeIcon, LearnIcon, QuizIcon, ProgressIcon } from "@/components/icons/
 const navItems = [
   { href: "/", icon: <HomeIcon />, label: "Home" },
   { href: "/learn", icon: <LearnIcon />, label: "Belajar" },
-  { href: "/quiz", icon: <QuizIcon />, label: "Quiz" },
+  { href: "/levels", icon: <QuizIcon />, label: "Ujian" },
+  { href: "/stories", icon: <LearnIcon />, label: "Bacaan" },
   { href: "/progress", icon: <ProgressIcon />, label: "Progress" },
 ];
 
