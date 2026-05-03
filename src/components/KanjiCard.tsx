@@ -18,9 +18,9 @@ export default function KanjiCard({ kanji, showNumber = false }: KanjiCardProps)
       <div className={`flip-card ${flipped ? "flipped" : ""}`}>
         {/* Front */}
         <div className="flip-card-front">
-          <div onClick={() => setFlipped(true)} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer' }}>
+          <div onClick={() => setFlipped(true)} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', gap: 12 }}>
             {showNumber && (
-              <span className="badge badge-purple" style={{ marginBottom: 12 }}>
+              <span className="badge badge-purple" style={{ marginBottom: 4 }}>
                 #{kanji.id}
               </span>
             )}
@@ -36,34 +36,49 @@ export default function KanjiCard({ kanji, showNumber = false }: KanjiCardProps)
 
         {/* Back */}
         <div className="flip-card-back" onClick={() => setFlipped(false)}>
-          <span className="flip-prompt">Arti & Cara Baca</span>
-          <p className="kanji-meaning">{kanji.meaning}</p>
-          <div style={{ marginBottom: 12 }}>
-            <p className="kanji-reading" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-              <MeaningIcon style={{ width: 18, height: 18 }} /> {kanji.onyomi}
-            </p>
-            {kanji.kunyomi && kanji.kunyomi !== "-" && (
-              <p className="kanji-sub">Kunyomi: {kanji.kunyomi}</p>
+          <div className="kanji-back-content">
+            <div className="kanji-back-header">
+              <span className="flip-prompt">Arti & Cara Baca</span>
+              <span className="badge badge-cyan">{kanji.category}</span>
+            </div>
+
+            <div className="kanji-meaning-section">
+              <p className="kanji-meaning">{kanji.meaning}</p>
+              <div className="kanji-readings">
+                <p className="kanji-reading">
+                  <MeaningIcon style={{ width: 16, height: 16 }} />
+                  <span className="reading-label">On:</span>
+                  <span>{kanji.onyomi}</span>
+                </p>
+                {kanji.kunyomi && kanji.kunyomi !== "-" && (
+                  <p className="kanji-reading">
+                    <MeaningIcon style={{ width: 16, height: 16 }} />
+                    <span className="reading-label">Kun:</span>
+                    <span>{kanji.kunyomi}</span>
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {kanji.examples && kanji.examples.length > 0 && (
+              <div className="kanji-examples-section">
+                <p className="examples-label">📚 Contoh Kata</p>
+                <div className="examples-list">
+                  {kanji.examples.map((ex, i) => (
+                    <div key={i} className="example-item">
+                      <div className="example-header">
+                        <span className="example-word">{ex.word}</span>
+                        <span className="example-reading">{ex.reading}</span>
+                      </div>
+                      <p className="example-meaning">{ex.meaning}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
 
-          {kanji.examples && kanji.examples.length > 0 && (
-            <div style={{ marginBottom: 16, textAlign: 'left', width: '100%' }}>
-              <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6 }}>Contoh Kata:</p>
-              {kanji.examples.map((ex, i) => (
-                <div key={i} style={{ background: 'rgba(255,255,255,0.05)', padding: '6px 10px', borderRadius: 8, marginBottom: 4 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                    <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--accent-cyan)' }}>{ex.word}</span>
-                    <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{ex.reading}</span>
-                  </div>
-                  <p style={{ fontSize: 12, color: 'var(--text-primary)' }}>{ex.meaning}</p>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <span className="badge badge-cyan">{kanji.category}</span>
-          <span className="flip-hint" style={{ marginTop: 12, display: "flex", alignItems: "center" }}>
+          <span className="flip-hint" style={{ marginTop: 12, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <TapIcon style={{ width: 14, height: 14, marginRight: 4 }} /> tap untuk kembali
           </span>
         </div>
@@ -80,36 +95,9 @@ export function KanjiMiniCard({ kanji }: { kanji: Kanji }) {
     <motion.div
       whileTap={{ scale: 0.97 }}
       onClick={() => setFlipped(!flipped)}
-      style={{
-        background: flipped
-          ? "linear-gradient(145deg, rgba(6,182,212,0.1) 0%, rgba(8,8,18,0.9) 100%)"
-          : "var(--glass-bg)",
-        border: `1px solid ${flipped ? "rgba(6,182,212,0.25)" : "var(--glass-border)"}`,
-        borderRadius: "var(--radius-md)",
-        padding: "16px",
-        cursor: "pointer",
-        backdropFilter: "blur(16px)",
-        transition: "all 0.3s ease",
-        minHeight: 90,
-        display: "flex",
-        alignItems: "center",
-        gap: 16,
-      }}
+      className="kanji-mini-card"
     >
-      <span
-        style={{
-          fontSize: 36,
-          fontFamily: "'Noto Sans JP', serif",
-          fontWeight: 700,
-          background: "var(--gradient-aurora)",
-          WebkitBackgroundClip: "text",
-          backgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          minWidth: 44,
-          textAlign: "center",
-          flexShrink: 0,
-        }}
-      >
+      <span className="mini-kanji-char">
         {kanji.character}
       </span>
       <AnimatePresence mode="wait">
@@ -120,13 +108,10 @@ export function KanjiMiniCard({ kanji }: { kanji: Kanji }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
+            className="mini-card-front"
           >
-            <p style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 2 }}>
-              Tap untuk lihat arti
-            </p>
-            <p style={{ fontSize: 13, fontWeight: 600, color: "var(--accent-purple)" }}>
-              {kanji.onyomi}
-            </p>
+            <p className="mini-card-hint">Tap untuk lihat</p>
+            <p className="mini-card-reading">{kanji.onyomi}</p>
           </motion.div>
         ) : (
           <motion.div
@@ -135,13 +120,10 @@ export function KanjiMiniCard({ kanji }: { kanji: Kanji }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
+            className="mini-card-back"
           >
-            <p style={{ fontSize: 16, fontWeight: 700, color: "var(--text-primary)", marginBottom: 2 }}>
-              {kanji.meaning}
-            </p>
-            <p style={{ fontSize: 12, color: "var(--accent-cyan)" }}>
-              {kanji.onyomi}
-            </p>
+            <p className="mini-card-meaning">{kanji.meaning}</p>
+            <p className="mini-card-category">{kanji.category}</p>
           </motion.div>
         )}
       </AnimatePresence>

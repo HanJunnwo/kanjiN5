@@ -166,13 +166,7 @@ function LearnContent() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.15 }}
           >
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 10,
-              }}
-            >
+            <div className="learn-list-container">
               {filteredKanji.map((kanji, i) => (
                 <motion.div
                   key={kanji.id}

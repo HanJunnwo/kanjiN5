@@ -56,12 +56,12 @@ export default function WritingPage() {
         strokeAnimationSpeed: 1,
         delayBetweenStrokes: 200,
         strokeColor: "#8b5cf6",
-        outlineColor: "rgba(255,255,255,0.15)",
+        outlineColor: "rgba(139, 92, 246, 0.3)",
         drawingColor: "#06b6d4",
         radicalColor: "#6d28d9",
       });
     }
-  }, [currentKanji, canvasSize]);
+  }, [currentKanji, canvasSize, HanziWriterRef]);
 
   const handleAnimate = () => {
     if (writerRef.current) {
@@ -183,7 +183,7 @@ export default function WritingPage() {
                 <div
                   ref={containerRef}
                   className="writing-canvas"
-                  style={{ width: canvasSize + 30, height: canvasSize + 30 }}
+                  style={{ width: canvasSize + 60, height: canvasSize + 60, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 />
 
                 {isQuizzing && (

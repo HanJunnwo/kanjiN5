@@ -7,24 +7,59 @@ import { stories, Story } from "@/data/stories";
 import { kanjiData } from "@/data/kanji";
 import { BookIcon } from "@/components/icons/UIIcons";
 
-function RubyText({ content, furigana, kanjiUsed }: { content: string; furigana: Record<string, string>; kanjiUsed: string[] }) {
-  const chars = content.split("");
-  return (
-    <span>
-      {chars.map((char, i) => {
-        if (char === "\n") return <br key={i} />;
-        const isKanji = kanjiUsed.includes(char);
-        if (isKanji && furigana[char]) {
-          return (
-            <ruby key={i} className="story-ruby">
-              <span className="story-kanji-char">{char}</span>
-              <rt className="story-furigana">{furigana[char]}</rt>
-            </ruby>
-          );
+function StoryTextDisplay({ content, furigana, kanjiUsed }: { content: string; furigana: Record<string, string>; kanjiUsed: string[] }) {
+  // Convert content to hiragana version
+  const getHiraganaVersion = () => {
+    return content
+      .split("")
+      .map(char => {
+        if (kanjiUsed.includes(char) && furigana[char]) {
+          return furigana[char];
         }
-        return <span key={i}>{char}</span>;
-      })}
-    </span>
+        return char;
+      })
+      .join("");
+  };
+
+  const hiraganaContent = getHiraganaVersion();
+  const paragraphs = content.split("\n\n");
+  const hiraganaParas = hiraganaContent.split("\n\n");
+
+  return (
+    <div className="story-text-display">
+      {paragraphs.map((para, idx) => (
+        <div key={idx} className="story-paragraph-block">
+          {/* Kanji version */}
+          <div className="story-kanji-text">
+            {para.split("\n").map((line, lineIdx) => (
+              <div key={lineIdx} className="story-text-line">
+                {line.split("").map((char, charIdx) => {
+                  const isKanji = kanjiUsed.includes(char);
+                  return (
+                    <span
+                      key={charIdx}
+                      className={isKanji ? "story-kanji-char-highlight" : ""}
+                      title={isKanji && kanjiData.find(k => k.character === char) ? `${kanjiData.find(k => k.character === char)?.meaning}` : ""}
+                    >
+                      {char}
+                    </span>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+
+          {/* Hiragana version */}
+          <div className="story-hiragana-text">
+            {hiraganaParas[idx]?.split("\n").map((line, lineIdx) => (
+              <div key={lineIdx} className="story-text-line">
+                {line}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -87,16 +122,16 @@ export default function StoriesPage() {
           </div>
         ) : (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, gap: 12 }}>
-              <button onClick={() => setSelectedStory(null)} className="btn-secondary" style={{ fontSize: 13 }}>
+            <div className="story-control-bar">
+              <button onClick={() => setSelectedStory(null)} className="btn-secondary">
                 ← Kembali
               </button>
               <button
                 onClick={() => setShowFurigana(!showFurigana)}
-                className={`btn-secondary ${showFurigana ? "" : ""}`}
-                style={{ fontSize: 13, borderColor: showFurigana ? "var(--accent-cyan)" : "var(--glass-border)", color: showFurigana ? "var(--accent-cyan)" : "var(--text-secondary)" }}
+                className="btn-secondary"
+                style={{ borderColor: showFurigana ? "var(--accent-cyan)" : "var(--glass-border)", color: showFurigana ? "var(--accent-cyan)" : "var(--text-secondary)" }}
               >
-                {showFurigana ? "🔤 Furigana ON" : "🔤 Furigana OFF"}
+                {showFurigana ? "🔤 Hiragana + Kanji" : "🔤 Kanji Only"}
               </button>
             </div>
 
@@ -113,21 +148,23 @@ export default function StoriesPage() {
 
               <div className={`story-content ${showFurigana ? "with-furigana" : "no-furigana"}`}>
                 {showFurigana ? (
-                  <RubyText content={selectedStory.content} furigana={selectedStory.furigana} kanjiUsed={selectedStory.kanjiUsed} />
+                  <StoryTextDisplay content={selectedStory.content} furigana={selectedStory.furigana} kanjiUsed={selectedStory.kanjiUsed} />
                 ) : (
-                  selectedStory.content.split("").map((char, i) => {
-                    if (char === "\n") return <br key={i} />;
-                    const isKanji = selectedStory.kanjiUsed.includes(char);
-                    if (isKanji) {
-                      const info = kanjiData.find(k => k.character === char);
-                      return (
-                        <span key={i} className="story-kanji-highlight" title={info ? `${info.meaning} (${info.onyomi})` : undefined}>
-                          {char}
-                        </span>
-                      );
-                    }
-                    return <span key={i}>{char}</span>;
-                  })
+                  <div className="story-plain-text">
+                    {selectedStory.content.split("").map((char, i) => {
+                      if (char === "\n") return <br key={i} />;
+                      const isKanji = selectedStory.kanjiUsed.includes(char);
+                      if (isKanji) {
+                        const info = kanjiData.find(k => k.character === char);
+                        return (
+                          <span key={i} className="story-kanji-highlight" title={info ? `${info.meaning} (${info.onyomi})` : undefined}>
+                            {char}
+                          </span>
+                        );
+                      }
+                      return <span key={i}>{char}</span>;
+                    })}
+                  </div>
                 )}
               </div>
 
