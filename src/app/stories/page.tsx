@@ -1,14 +1,42 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import { stories, Story } from "@/data/stories";
 import { kanjiData } from "@/data/kanji";
 import { BookIcon } from "@/components/icons/UIIcons";
 
+function RubyText({ content, furigana, kanjiUsed }: { content: string; furigana: Record<string, string>; kanjiUsed: string[] }) {
+  const chars = content.split("");
+  return (
+    <span>
+      {chars.map((char, i) => {
+        if (char === "\n") return <br key={i} />;
+        const isKanji = kanjiUsed.includes(char);
+        if (isKanji && furigana[char]) {
+          return (
+            <ruby key={i} className="story-ruby">
+              <span className="story-kanji-char">{char}</span>
+              <rt className="story-furigana">{furigana[char]}</rt>
+            </ruby>
+          );
+        }
+        return <span key={i}>{char}</span>;
+      })}
+    </span>
+  );
+}
+
+const difficultyConfig = {
+  mudah: { label: "Mudah", color: "var(--accent-emerald)", bg: "rgba(16,185,129,0.12)", border: "rgba(16,185,129,0.25)" },
+  sedang: { label: "Sedang", color: "var(--accent-gold)", bg: "rgba(245,158,11,0.12)", border: "rgba(245,158,11,0.25)" },
+  sulit: { label: "Sulit", color: "var(--accent-rose)", bg: "rgba(244,63,94,0.12)", border: "rgba(244,63,94,0.25)" },
+};
+
 export default function StoriesPage() {
   const [selectedStory, setSelectedStory] = useState<Story | null>(null);
+  const [showFurigana, setShowFurigana] = useState(true);
 
   return (
     <div className="app-wrapper">
@@ -27,85 +55,98 @@ export default function StoriesPage() {
 
         {!selectedStory ? (
           <div style={{ display: "grid", gap: 16 }}>
-            {stories.map((story, i) => (
-              <motion.div
-                key={story.id}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="glass-card"
-                style={{ padding: 20, cursor: "pointer" }}
-                onClick={() => setSelectedStory(story)}
-                whileTap={{ scale: 0.98 }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <h3 style={{ fontSize: 18, fontWeight: 700, color: "var(--text-primary)" }}>{story.title}</h3>
-                  <span style={{ fontSize: 12, color: "var(--accent-purple)" }}>{story.kanjiUsed.length} Kanji</span>
-                </div>
-                <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 8, overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
-                  {story.content}
-                </p>
-              </motion.div>
-            ))}
+            {stories.map((story, i) => {
+              const dc = difficultyConfig[story.difficulty];
+              return (
+                <motion.div
+                  key={story.id}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.08 }}
+                  className="glass-card story-list-card"
+                  onClick={() => setSelectedStory(story)}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="story-list-header">
+                    <div>
+                      <h3 className="story-list-title">{story.title}</h3>
+                      <div className="story-list-meta">
+                        <span className="badge" style={{ background: dc.bg, color: dc.color, borderColor: dc.border, border: `1px solid ${dc.border}` }}>
+                          {dc.label}
+                        </span>
+                        <span className="story-list-info">📖 {story.readTime} menit</span>
+                        <span className="story-list-info">漢 {story.kanjiUsed.length} kanji</span>
+                      </div>
+                    </div>
+                    <span className="story-list-arrow">→</span>
+                  </div>
+                  <p className="story-list-preview">{story.content.replace(/\n/g, " ").slice(0, 80)}...</p>
+                </motion.div>
+              );
+            })}
           </div>
         ) : (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-          >
-            <button
-              onClick={() => setSelectedStory(null)}
-              className="btn-secondary"
-              style={{ marginBottom: 20, fontSize: 13 }}
-            >
-              ← Kembali ke Daftar
-            </button>
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, gap: 12 }}>
+              <button onClick={() => setSelectedStory(null)} className="btn-secondary" style={{ fontSize: 13 }}>
+                ← Kembali
+              </button>
+              <button
+                onClick={() => setShowFurigana(!showFurigana)}
+                className={`btn-secondary ${showFurigana ? "" : ""}`}
+                style={{ fontSize: 13, borderColor: showFurigana ? "var(--accent-cyan)" : "var(--glass-border)", color: showFurigana ? "var(--accent-cyan)" : "var(--text-secondary)" }}
+              >
+                {showFurigana ? "🔤 Furigana ON" : "🔤 Furigana OFF"}
+              </button>
+            </div>
 
-            <div className="glass-card" style={{ padding: 24 }}>
-              <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--accent-purple)", marginBottom: 16 }}>
-                {selectedStory.title}
-              </h2>
-
-              <div style={{ fontSize: 20, lineHeight: 2, color: "var(--text-primary)", marginBottom: 24, fontFamily: "'Noto Sans JP', serif" }}>
-                {selectedStory.content.split('').map((char, i) => {
-                  const isKanji = selectedStory.kanjiUsed.includes(char);
-                  if (isKanji) {
-                    const kanjiInfo = kanjiData.find(k => k.character === char);
-                    return (
-                      <span
-                        key={i}
-                        style={{ color: "var(--accent-cyan)", borderBottom: "2px solid var(--accent-cyan)", cursor: "help", padding: "0 2px" }}
-                        title={kanjiInfo ? `${kanjiInfo.meaning} (${kanjiInfo.onyomi})` : undefined}
-                      >
-                        {char}
-                      </span>
-                    );
-                  }
-                  return <span key={i}>{char}</span>;
-                })}
+            <div className="glass-card story-reader-card">
+              <div className="story-reader-header">
+                <h2 className="story-reader-title">{selectedStory.title}</h2>
+                <div className="story-reader-badges">
+                  {(() => { const dc = difficultyConfig[selectedStory.difficulty]; return (
+                    <span className="badge" style={{ background: dc.bg, color: dc.color, border: `1px solid ${dc.border}` }}>{dc.label}</span>
+                  ); })()}
+                  <span className="badge badge-cyan">📖 {selectedStory.readTime} menit</span>
+                </div>
               </div>
 
-              <div style={{ borderTop: "1px solid var(--glass-border)", paddingTop: 20 }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", marginBottom: 8 }}>Terjemahan:</p>
-                <p style={{ fontSize: 15, color: "var(--text-secondary)", lineHeight: 1.6 }}>
-                  {selectedStory.translation}
-                </p>
+              <div className={`story-content ${showFurigana ? "with-furigana" : "no-furigana"}`}>
+                {showFurigana ? (
+                  <RubyText content={selectedStory.content} furigana={selectedStory.furigana} kanjiUsed={selectedStory.kanjiUsed} />
+                ) : (
+                  selectedStory.content.split("").map((char, i) => {
+                    if (char === "\n") return <br key={i} />;
+                    const isKanji = selectedStory.kanjiUsed.includes(char);
+                    if (isKanji) {
+                      const info = kanjiData.find(k => k.character === char);
+                      return (
+                        <span key={i} className="story-kanji-highlight" title={info ? `${info.meaning} (${info.onyomi})` : undefined}>
+                          {char}
+                        </span>
+                      );
+                    }
+                    return <span key={i}>{char}</span>;
+                  })
+                )}
+              </div>
+
+              <div className="story-translation-section">
+                <p className="story-translation-label">🇮🇩 Terjemahan</p>
+                <p className="story-translation-text">{selectedStory.translation}</p>
               </div>
             </div>
 
             <div style={{ marginTop: 24 }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 12 }}>Kanji yang digunakan:</p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              <p className="story-kanji-list-title">Kanji yang digunakan:</p>
+              <div className="story-kanji-grid">
                 {selectedStory.kanjiUsed.map(char => {
-                  const kanjiInfo = kanjiData.find(k => k.character === char);
-                  if (!kanjiInfo) return null;
+                  const info = kanjiData.find(k => k.character === char);
+                  if (!info) return null;
                   return (
-                    <div
-                      key={char}
-                      style={{ background: "var(--glass-bg)", padding: "4px 10px", borderRadius: 8, border: "1px solid var(--glass-border)", fontSize: 14 }}
-                    >
-                      <span style={{ fontWeight: 700, color: "var(--accent-purple)", marginRight: 6 }}>{char}</span>
-                      <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{kanjiInfo.meaning}</span>
+                    <div key={char} className="story-kanji-tag">
+                      <span className="story-kanji-tag-char">{char}</span>
+                      <span className="story-kanji-tag-meaning">{info.meaning}</span>
                     </div>
                   );
                 })}

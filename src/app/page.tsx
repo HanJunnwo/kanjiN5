@@ -6,7 +6,7 @@ import Navbar from "@/components/Navbar";
 import { kanjiData, categories, categoryEmoji } from "@/data/kanji";
 import { useProgress } from "@/hooks/useProgress";
 import { FlameIcon, BookIcon } from "@/components/icons/UIIcons";
-import { QuizIcon } from "@/components/icons/NavIcons";
+import { QuizIcon, PenIcon } from "@/components/icons/NavIcons";
 import { HeroJapanIcon } from "@/components/icons/HeroIllustration";
 
 const containerVariants = {
@@ -101,22 +101,22 @@ export default function HomePage() {
               <Link href="/learn" className="action-card purple" id="home-learn-btn">
                 <BookIcon className="action-icon" />
                 <span className="action-title">Flashcard</span>
-                <span className="action-desc">Belajar kanji & nulis</span>
+                <span className="action-desc">Belajar kanji</span>
               </Link>
-              <Link href="/levels" className="action-card cyan" id="home-quiz-btn">
+              <Link href="/writing" className="action-card cyan" id="home-write-btn">
+                <PenIcon className="action-icon" />
+                <span className="action-title">Latihan Menulis</span>
+                <span className="action-desc">Tulis kanji fullscreen</span>
+              </Link>
+              <Link href="/levels" className="action-card gold" id="home-quiz-btn">
                 <QuizIcon className="action-icon" />
-                <span className="action-title">Ujian</span>
-                <span className="action-desc">20 Level tantangan</span>
+                <span className="action-title">Ujian JLPT</span>
+                <span className="action-desc">50 soal N5 style</span>
               </Link>
-              <Link href="/stories" className="action-card gold" id="home-stories-btn">
+              <Link href="/stories" className="action-card purple" id="home-stories-btn">
                 <BookIcon className="action-icon" />
                 <span className="action-title">Bacaan</span>
-                <span className="action-desc">Cerita pendek N5</span>
-              </Link>
-              <Link href="/quiz" className="action-card purple" id="home-quick-quiz-btn">
-                <QuizIcon className="action-icon" />
-                <span className="action-title">Quick Quiz</span>
-                <span className="action-desc">Latihan cepat</span>
+                <span className="action-desc">Cerita dengan furigana</span>
               </Link>
             </div>
           </motion.div>

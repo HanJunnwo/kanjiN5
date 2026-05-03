@@ -1,82 +1,80 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
-import { levels, Level } from "@/data/levels";
-import { kanjiData, Kanji } from "@/data/kanji";
+import { examQuestions, ExamQuestion } from "@/data/examQuestions";
 import { useProgress } from "@/hooks/useProgress";
 import { QuizIcon } from "@/components/icons/NavIcons";
 
-export default function LevelsPage() {
-  const router = useRouter();
-  const { progress, completeLevel } = useProgress();
-  const [activeLevel, setActiveLevel] = useState<Level | null>(null);
+const QUESTIONS_PER_LEVEL = 5;
+const TOTAL_LEVELS = 10;
 
-  // Quiz state
+interface LevelInfo {
+  id: number;
+  title: string;
+  questions: ExamQuestion[];
+  passingScore: number;
+}
+
+function buildLevels(): LevelInfo[] {
+  return Array.from({ length: TOTAL_LEVELS }, (_, i) => {
+    const start = i * QUESTIONS_PER_LEVEL;
+    const end = Math.min(start + QUESTIONS_PER_LEVEL, examQuestions.length);
+    const qs = examQuestions.slice(start, end);
+    return {
+      id: i + 1,
+      title: `Level ${i + 1}`,
+      questions: qs,
+      passingScore: Math.ceil(qs.length * 0.6),
+    };
+  });
+}
+
+const typeLabels: Record<string, { label: string; color: string }> = {
+  reading: { label: "読み方", color: "var(--accent-purple)" },
+  kanji: { label: "漢字", color: "var(--accent-cyan)" },
+  vocabulary: { label: "語彙", color: "var(--accent-gold)" },
+  grammar: { label: "文法", color: "var(--accent-emerald)" },
+};
+
+export default function LevelsPage() {
+  const { progress, completeLevel, recordQuiz } = useProgress();
+  const levels = useMemo(buildLevels, []);
+
+  const [activeLevel, setActiveLevel] = useState<LevelInfo | null>(null);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [isAnswered, setIsAnswered] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [quizFinished, setQuizFinished] = useState(false);
-
-  const levelQuestions = useMemo(() => {
-    if (!activeLevel) return [];
-
-    return activeLevel.kanjiIds.map(id => {
-      const kanji = kanjiData.find(k => k.id === id)!;
-      // Generate a context-based question or simple reading/meaning
-      const type = Math.random() > 0.5 ? "reading" : "meaning";
-
-      const others = kanjiData
-        .filter(k => k.id !== kanji.id)
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 3);
-
-      if (type === "reading") {
-        const correctAnswer = kanji.onyomi;
-        const options = [correctAnswer, ...others.map(o => o.onyomi)].sort(() => Math.random() - 0.5);
-        return {
-          question: `Apa cara baca (Onyomi) dari kanji "${kanji.character}"?`,
-          options,
-          correctAnswer,
-          kanji: kanji.character
-        };
-      } else {
-        const correctAnswer = kanji.meaning;
-        const options = [correctAnswer, ...others.map(o => o.meaning)].sort(() => Math.random() - 0.5);
-        return {
-          question: `Apa arti dari kanji "${kanji.character}"?`,
-          options,
-          correctAnswer,
-          kanji: kanji.character
-        };
-      }
-    });
-  }, [activeLevel]);
+  const [showExplanation, setShowExplanation] = useState(false);
 
   const handleAnswer = (answer: string) => {
     if (isAnswered) return;
     setSelectedAnswer(answer);
     setIsAnswered(true);
+    setShowExplanation(true);
 
-    if (answer === levelQuestions[currentIdx].correctAnswer) {
-      setScore(s => s + 1);
+    if (answer === activeLevel!.questions[currentIdx].correctAnswer) {
+      setScore((s) => s + 1);
     }
+  };
 
-    setTimeout(() => {
-      if (currentIdx + 1 < levelQuestions.length) {
-        setCurrentIdx(i => i + 1);
-        setIsAnswered(false);
-        setSelectedAnswer(null);
-      } else {
-        setQuizFinished(true);
-        if (score + (answer === levelQuestions[currentIdx].correctAnswer ? 1 : 0) >= (activeLevel?.passingScore || 0)) {
-          completeLevel(activeLevel!.id);
-        }
+  const handleNext = () => {
+    if (currentIdx + 1 < activeLevel!.questions.length) {
+      setCurrentIdx((i) => i + 1);
+      setIsAnswered(false);
+      setSelectedAnswer(null);
+      setShowExplanation(false);
+    } else {
+      const finalScore = score + (selectedAnswer === activeLevel!.questions[currentIdx].correctAnswer ? 0 : 0);
+      setQuizFinished(true);
+      recordQuiz(score, activeLevel!.questions.length, []);
+      if (score >= activeLevel!.passingScore) {
+        completeLevel(activeLevel!.id);
       }
-    }, 1000);
+    }
   };
 
   const resetQuiz = () => {
@@ -86,154 +84,191 @@ export default function LevelsPage() {
     setIsAnswered(false);
     setSelectedAnswer(null);
     setQuizFinished(false);
+    setShowExplanation(false);
   };
 
-  return (
-    <div className="app-wrapper">
-      <main className="page-content">
-        <motion.div
-          initial={{ opacity: 0, y: -16 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="page-header"
-        >
-          <div>
-            <h1 className="page-title">Level Ujian</h1>
-            <p className="page-subtitle">Selesaikan 20 level tantangan Kanji</p>
-          </div>
-          <QuizIcon style={{ width: 32, height: 32, color: "var(--accent-gold)" }} />
-        </motion.div>
+  const startLevel = (level: LevelInfo) => {
+    setActiveLevel(level);
+    setCurrentIdx(0);
+    setScore(0);
+    setIsAnswered(false);
+    setSelectedAnswer(null);
+    setQuizFinished(false);
+    setShowExplanation(false);
+  };
 
-        {!activeLevel ? (
-          <div className="level-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-            {levels.map((level) => {
+  // LEVEL SELECT
+  if (!activeLevel) {
+    return (
+      <div className="app-wrapper">
+        <main className="page-content">
+          <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} className="page-header">
+            <div>
+              <h1 className="page-title">Ujian JLPT N5</h1>
+              <p className="page-subtitle">50 soal bergaya ujian JLPT N5</p>
+            </div>
+            <QuizIcon style={{ width: 32, height: 32, color: "var(--accent-gold)" }} />
+          </motion.div>
+
+          <div className="exam-level-grid">
+            {levels.map((level, i) => {
               const isCompleted = (progress.completedLevels || []).includes(level.id);
               const isLocked = level.id > 1 && !(progress.completedLevels || []).includes(level.id - 1);
 
               return (
                 <motion.button
                   key={level.id}
-                  whileTap={!isLocked ? { scale: 0.95 } : {}}
-                  onClick={() => !isLocked && setActiveLevel(level)}
-                  className={`level-card ${isCompleted ? "completed" : ""} ${isLocked ? "locked" : ""}`}
-                  style={{
-                    aspectRatio: "1/1",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    background: isLocked ? "rgba(255,255,255,0.05)" : isCompleted ? "var(--accent-purple)" : "var(--glass-bg)",
-                    border: `1px solid ${isCompleted ? "var(--accent-purple)" : "var(--glass-border)"}`,
-                    borderRadius: 16,
-                    cursor: isLocked ? "not-allowed" : "pointer",
-                    position: "relative",
-                    opacity: isLocked ? 0.5 : 1
-                  }}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  whileTap={!isLocked ? { scale: 0.96 } : {}}
+                  onClick={() => !isLocked && startLevel(level)}
+                  className={`exam-level-card ${isCompleted ? "completed" : ""} ${isLocked ? "locked" : ""}`}
                 >
-                  <span style={{ fontSize: 18, fontWeight: 800, color: isCompleted ? "#fff" : "var(--text-primary)" }}>{level.id}</span>
-                  {isLocked && <span style={{ fontSize: 10 }}>🔒</span>}
-                  {isCompleted && <span style={{ position: "absolute", top: 4, right: 6, fontSize: 10 }}>✅</span>}
+                  <div className="exam-level-number">
+                    {isLocked ? "🔒" : isCompleted ? "✅" : level.id}
+                  </div>
+                  <div className="exam-level-info">
+                    <h3>{level.title}</h3>
+                    <p>{level.questions.length} soal · Min. {level.passingScore} benar</p>
+                  </div>
+                  {!isLocked && <span className="exam-level-arrow">→</span>}
                 </motion.button>
               );
             })}
           </div>
-        ) : (
-          <div className="quiz-container">
-            {!quizFinished ? (
+        </main>
+        <Navbar />
+      </div>
+    );
+  }
+
+  // QUIZ FINISHED
+  if (quizFinished) {
+    const pct = Math.round((score / activeLevel.questions.length) * 100);
+    const passed = score >= activeLevel.passingScore;
+    return (
+      <div className="app-wrapper">
+        <main className="page-content">
+          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="exam-result-card">
+            <div className="exam-result-emoji">{passed ? "🎉" : "💪"}</div>
+            <h2 className="exam-result-title">{passed ? "Level Selesai!" : "Coba Lagi!"}</h2>
+            <p className="exam-result-score">{score} / {activeLevel.questions.length} benar ({pct}%)</p>
+            <p className="exam-result-min">Minimal {activeLevel.passingScore} untuk lulus</p>
+
+            <div className="exam-result-bar-wrapper">
+              <div className="progress-bar" style={{ height: 10 }}>
+                <motion.div
+                  className="progress-fill"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${pct}%` }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                  style={{ background: passed ? "var(--accent-emerald)" : "var(--accent-rose)" }}
+                />
+              </div>
+            </div>
+
+            <div className="exam-result-actions">
+              <button onClick={resetQuiz} className="btn-primary" style={{ flex: 1 }}>
+                {passed ? "Kembali" : "Ulangi"}
+              </button>
+              {passed && activeLevel.id < TOTAL_LEVELS && (
+                <button
+                  onClick={() => {
+                    const next = levels.find((l) => l.id === activeLevel.id + 1);
+                    if (next) startLevel(next);
+                  }}
+                  className="btn-secondary"
+                  style={{ flex: 1 }}
+                >
+                  Level Berikutnya →
+                </button>
+              )}
+            </div>
+          </motion.div>
+        </main>
+        <Navbar />
+      </div>
+    );
+  }
+
+  // PLAYING
+  const q = activeLevel.questions[currentIdx];
+  const pct = Math.round((currentIdx / activeLevel.questions.length) * 100);
+  const tl = typeLabels[q.type] || typeLabels.reading;
+
+  return (
+    <div className="app-wrapper">
+      <main className="page-content">
+        {/* Header */}
+        <div className="exam-play-header">
+          <div className="exam-play-top">
+            <span className="exam-play-level">{activeLevel.title}</span>
+            <span className="exam-play-counter">Soal {currentIdx + 1} / {activeLevel.questions.length}</span>
+            <span className="quiz-score-badge">⭐ {score}</span>
+          </div>
+          <div className="progress-bar">
+            <motion.div className="progress-fill" animate={{ width: `${pct}%` }} transition={{ duration: 0.4 }} style={{ background: "var(--accent-gold)" }} />
+          </div>
+        </div>
+
+        {/* Question */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentIdx}
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -30 }}
+            transition={{ type: "spring", stiffness: 350, damping: 28 }}
+          >
+            <div className="exam-question-card">
+              <span className="exam-type-badge" style={{ color: tl.color, borderColor: tl.color }}>{tl.label}</span>
+
+              <p className="exam-question-text">{q.question}</p>
+              {q.context && <p className="exam-question-context">{q.context}</p>}
+            </div>
+
+            {/* Options */}
+            <div className="exam-options">
+              {q.options.map((opt, i) => {
+                let cls = "exam-option";
+                if (isAnswered) {
+                  if (opt === q.correctAnswer) cls += " correct";
+                  else if (opt === selectedAnswer && opt !== q.correctAnswer) cls += " wrong";
+                }
+                return (
+                  <motion.button
+                    key={i}
+                    className={cls}
+                    onClick={() => handleAnswer(opt)}
+                    disabled={isAnswered}
+                    whileTap={{ scale: isAnswered ? 1 : 0.97 }}
+                  >
+                    <span className="exam-option-letter">{String.fromCharCode(65 + i)}</span>
+                    <span className="exam-option-text">{opt}</span>
+                  </motion.button>
+                );
+              })}
+            </div>
+
+            {/* Explanation */}
+            {showExplanation && (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="exam-explanation"
               >
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, fontSize: 14 }}>
-                  <span>{activeLevel.title}: Soal {currentIdx + 1} / {levelQuestions.length}</span>
-                  <span>Skor: {score}</span>
-                </div>
-
-                <div className="progress-bar" style={{ marginBottom: 24 }}>
-                  <div
-                    className="progress-fill"
-                    style={{ width: `${((currentIdx + 1) / levelQuestions.length) * 100}%`, background: "var(--accent-gold)" }}
-                  />
-                </div>
-
-                <div className="glass-card" style={{ padding: 32, textAlign: "center", marginBottom: 24 }}>
-                   <p style={{ fontSize: 16, color: "var(--text-secondary)", marginBottom: 12 }}>{levelQuestions[currentIdx].question}</p>
-                   <p style={{ fontSize: 64, fontWeight: 800, color: "var(--text-primary)", fontFamily: "'Noto Sans JP', serif" }}>
-                     {levelQuestions[currentIdx].kanji}
-                   </p>
-                </div>
-
-                <div style={{ display: "grid", gap: 12 }}>
-                  {levelQuestions[currentIdx].options.map((opt, i) => {
-                    let style = { background: "var(--glass-bg)", borderColor: "var(--glass-border)" };
-                    if (isAnswered) {
-                      if (opt === levelQuestions[currentIdx].correctAnswer) {
-                        style = { background: "rgba(34, 197, 94, 0.2)", borderColor: "#22c55e" };
-                      } else if (opt === selectedAnswer) {
-                        style = { background: "rgba(239, 68, 68, 0.2)", borderColor: "#ef4444" };
-                      }
-                    }
-
-                    return (
-                      <button
-                        key={i}
-                        disabled={isAnswered}
-                        onClick={() => handleAnswer(opt)}
-                        style={{
-                          padding: 16,
-                          borderRadius: 12,
-                          border: "1px solid",
-                          textAlign: "left",
-                          fontSize: 15,
-                          fontWeight: 600,
-                          ...style
-                        }}
-                      >
-                        {opt}
-                      </button>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="glass-card"
-                style={{ padding: 40, textAlign: "center" }}
-              >
-                <div style={{ fontSize: 64, marginBottom: 16 }}>
-                  {score >= activeLevel.passingScore ? "🎉" : "💪"}
-                </div>
-                <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>
-                  {score >= activeLevel.passingScore ? "Level Selesai!" : "Coba Lagi!"}
-                </h2>
-                <p style={{ color: "var(--text-secondary)", marginBottom: 24 }}>
-                  Skor kamu: {score} / {levelQuestions.length}<br />
-                  (Minimal {activeLevel.passingScore} untuk lulus)
+                <p className="exam-explanation-label">
+                  {selectedAnswer === q.correctAnswer ? "✅ Benar!" : "❌ Salah!"}
                 </p>
-
-                <div style={{ display: "flex", gap: 12 }}>
-                  <button onClick={resetQuiz} className="btn-primary" style={{ flex: 1 }}>
-                    {score >= activeLevel.passingScore ? "Selesai" : "Ulangi"}
-                  </button>
-                  {score >= activeLevel.passingScore && activeLevel.id < 20 && (
-                    <button
-                      onClick={() => {
-                        const nextLevel = levels.find(l => l.id === activeLevel.id + 1);
-                        resetQuiz();
-                        setActiveLevel(nextLevel || null);
-                      }}
-                      className="btn-secondary"
-                      style={{ flex: 1 }}
-                    >
-                      Level Berikutnya
-                    </button>
-                  )}
-                </div>
+                <p className="exam-explanation-text">{q.explanation}</p>
+                <button onClick={handleNext} className="btn-primary" style={{ width: "100%", marginTop: 16 }}>
+                  {currentIdx + 1 < activeLevel.questions.length ? "Soal Berikutnya →" : "Lihat Hasil"}
+                </button>
               </motion.div>
             )}
-          </div>
-        )}
+          </motion.div>
+        </AnimatePresence>
       </main>
       <Navbar />
     </div>

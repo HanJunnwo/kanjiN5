@@ -4,7 +4,6 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Kanji } from "@/data/kanji";
 import { TapIcon, MeaningIcon } from "@/components/icons/UIIcons";
-import KanjiWriter from "./KanjiWriter";
 
 interface KanjiCardProps {
   kanji: Kanji;
@@ -32,11 +31,6 @@ export default function KanjiCard({ kanji, showNumber = false }: KanjiCardProps)
             <span className="flip-hint" style={{ display: "flex", alignItems: "center" }}>
               <TapIcon style={{ width: 14, height: 14, marginRight: 4 }} /> tap untuk lihat arti
             </span>
-          </div>
-
-          <div style={{ marginTop: 20, width: '100%' }}>
-             <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10, textAlign: 'center' }}>Latihan Menulis</p>
-             <KanjiWriter character={kanji.character} size={120} />
           </div>
         </div>
 
