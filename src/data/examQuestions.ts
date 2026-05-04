@@ -418,4 +418,87 @@ export const examQuestions: ExamQuestion[] = [
     correctAnswer: "辞書",
     explanation: "辞書（じしょ）= Kamus. 'Meminjam kamus untuk belajar bahasa Jepang'."
   },
+
+  // --- SOAL 51-60: Kanji Guessing Quiz (Short Form) ---
+  {
+    id: 51, type: "kanji",
+    question: "さとう - こめ - しお",
+    context: "「さとう」は　どの　かんじですか。",
+    options: ["砂糖", "砂漠", "砂利", "砂"],
+    correctAnswer: "砂糖",
+    explanation: "砂糖（さとう）= Gula. Tiga bahan masak penting: 砂糖（gula）- 米（beras）- 塩（garam）."
+  },
+  {
+    id: 52, type: "kanji",
+    question: "あさ - ひる - よる",
+    context: "「あさ」は　どの　かんじですか。",
+    options: ["朝", "曜", "夜", "午"],
+    correctAnswer: "朝",
+    explanation: "朝（あさ）= Pagi. 三つの時間: 朝（pagi）- 昼（siang）- 夜（malam）."
+  },
+  {
+    id: 53, type: "kanji",
+    question: "せんせい - がくせい - きょうしつ",
+    context: "「きょうしつ」は　どの　かんじですか。",
+    options: ["教室", "教育", "教科", "教会"],
+    correctAnswer: "教室",
+    explanation: "教室（きょうしつ）= Ruang kelas. Tempat guru mengajar siswa."
+  },
+  {
+    id: 54, type: "kanji",
+    question: "あき - ふゆ - はる - なつ",
+    context: "「ふゆ」は　どの　かんじですか。",
+    options: ["冬", "秋", "春", "夏"],
+    correctAnswer: "冬",
+    explanation: "冬（ふゆ）= Musim dingin. Empat musim: 春、夏、秋、冬."
+  },
+  {
+    id: 55, type: "kanji",
+    question: "げつようび - すいようび - きんようび",
+    context: "「きんようび」は　どの　かんじですか。",
+    options: ["金曜日", "木曜日", "火曜日", "土曜日"],
+    correctAnswer: "金曜日",
+    explanation: "金曜日（きんようび）= Hari Jumat. Hari ketujuh dalam seminggu (Jum'at)."
+  },
+  {
+    id: 56, type: "kanji",
+    question: "がっこう - しょうがっこう - ちゅうがっこう - こうこう",
+    context: "「ちゅうがっこう」は　どの　かんじですか。",
+    options: ["中学校", "小学校", "高校", "大学"],
+    correctAnswer: "中学校",
+    explanation: "中学校（ちゅうがっこう）= Sekolah menengah pertama (SMP). 中 = menengah."
+  },
+  {
+    id: 57, type: "kanji",
+    question: "おとうさん - おかあさん - お兄さん",
+    context: "「お兄さん」は　どの　かんじですか。",
+    options: ["兄", "姉", "弟", "妹"],
+    correctAnswer: "兄",
+    explanation: "兄（あに）= Kakak laki-laki. Anggota keluarga dengan お prefix."
+  },
+  {
+    id: 58, type: "kanji",
+    question: "ほん - しんぶん - ざっし - じしょ",
+    context: "「じしょ」は　どの　かんじですか。",
+    options: ["辞書", "地図", "地震", "地球"],
+    correctAnswer: "辞書",
+    explanation: "辞書（じしょ）= Kamus. Buku referensi untuk belajar bahasa."
+  },
+  {
+    id: 59, type: "kanji",
+    question: "せんせい - べんきょう - しゅくだい",
+    context: "「しゅくだい」は　どの　かんじですか。",
+    options: ["宿題", "宿泊", "宿屋", "宿敵"],
+    correctAnswer: "宿題",
+    explanation: "宿題（しゅくだい）= Pekerjaan rumah. Tugas yang diberikan guru di rumah."
+  },
+  {
+    id: 60, type: "kanji",
+    question: "たべもの - のみもの - あますもの",
+    context: "「のみもの」は　どの　かんじですか。",
+    options: ["飲み物", "飲料", "飲酒", "飲呑"],
+    correctAnswer: "飲み物",
+    explanation: "飲み物（のみもの）= Minuman. 飲む＋もの = sesuatu untuk diminum."
+  },
 ];
+

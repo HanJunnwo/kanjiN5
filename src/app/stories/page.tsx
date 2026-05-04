@@ -69,9 +69,41 @@ const difficultyConfig = {
   sulit: { label: "Sulit", color: "var(--accent-rose)", bg: "rgba(244,63,94,0.12)", border: "rgba(244,63,94,0.25)" },
 };
 
+type DisplayMode = "both" | "kanji-only" | "hiragana-only";
+
 export default function StoriesPage() {
   const [selectedStory, setSelectedStory] = useState<Story | null>(null);
-  const [showFurigana, setShowFurigana] = useState(true);
+  const [displayMode, setDisplayMode] = useState<DisplayMode>("both");
+
+  const getHiraganaVersion = (content: string, furigana: Record<string, string>) => {
+    return content
+      .split("")
+      .map(char => {
+        // Jika ada di furigana record, gunakan hiragana
+        if (furigana[char]) {
+          return furigana[char];
+        }
+        // Jika bukan kanji, kembalikan seperti semula
+        return char;
+      })
+      .join("");
+  };
+
+  const getModeLabel = (): string => {
+    switch (displayMode) {
+      case "both": return "🔤 Hiragana + Kanji";
+      case "kanji-only": return "🔤 Kanji Only";
+      case "hiragana-only": return "🔤 Hiragana Only";
+    }
+  };
+
+  const cycleDisplayMode = () => {
+    setDisplayMode(mode => {
+      if (mode === "both") return "kanji-only";
+      if (mode === "kanji-only") return "hiragana-only";
+      return "both";
+    });
+  };
 
   return (
     <div className="app-wrapper">
@@ -127,11 +159,11 @@ export default function StoriesPage() {
                 ← Kembali
               </button>
               <button
-                onClick={() => setShowFurigana(!showFurigana)}
+                onClick={cycleDisplayMode}
                 className="btn-secondary"
-                style={{ borderColor: showFurigana ? "var(--accent-cyan)" : "var(--glass-border)", color: showFurigana ? "var(--accent-cyan)" : "var(--text-secondary)" }}
+                style={{ borderColor: "var(--accent-cyan)", color: "var(--accent-cyan)" }}
               >
-                {showFurigana ? "🔤 Hiragana + Kanji" : "🔤 Kanji Only"}
+                {getModeLabel()}
               </button>
             </div>
 
@@ -146,10 +178,11 @@ export default function StoriesPage() {
                 </div>
               </div>
 
-              <div className={`story-content ${showFurigana ? "with-furigana" : "no-furigana"}`}>
-                {showFurigana ? (
+              <div className={`story-content ${displayMode === "both" ? "with-furigana" : "no-furigana"}`}>
+                {displayMode === "both" && (
                   <StoryTextDisplay content={selectedStory.content} furigana={selectedStory.furigana} kanjiUsed={selectedStory.kanjiUsed} />
-                ) : (
+                )}
+                {displayMode === "kanji-only" && (
                   <div className="story-plain-text">
                     {selectedStory.content.split("").map((char, i) => {
                       if (char === "\n") return <br key={i} />;
@@ -162,6 +195,14 @@ export default function StoriesPage() {
                           </span>
                         );
                       }
+                      return <span key={i}>{char}</span>;
+                    })}
+                  </div>
+                )}
+                {displayMode === "hiragana-only" && (
+                  <div className="story-plain-text">
+                    {getHiraganaVersion(selectedStory.content, selectedStory.furigana).split("").map((char, i) => {
+                      if (char === "\n") return <br key={i} />;
                       return <span key={i}>{char}</span>;
                     })}
                   </div>

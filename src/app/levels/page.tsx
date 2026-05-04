@@ -7,7 +7,7 @@ import { examQuestions, ExamQuestion } from "@/data/examQuestions";
 import { useProgress } from "@/hooks/useProgress";
 import { QuizIcon } from "@/components/icons/NavIcons";
 
-const QUESTIONS_PER_LEVEL = 5;
+const QUESTIONS_PER_LEVEL = 6;
 const TOTAL_LEVELS = 10;
 
 interface LevelInfo {
